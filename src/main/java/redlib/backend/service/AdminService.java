@@ -28,7 +28,7 @@ public interface AdminService {
 
     Integer add(AdminDTO adminDTO);
 
-    Integer delete(List<String> userCodes);
+    Integer delete(List<Integer> ids);
 
     void updatePassword(String oldPassword, String password);
 }

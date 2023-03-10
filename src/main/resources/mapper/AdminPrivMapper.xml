@@ -44,9 +44,12 @@
         where admin_id = #{id,jdbcType=INTEGER}
     </select>
 
-    <delete id="deleteByAdminId" parameterType="java.lang.Integer">
+    <delete id="deleteByAdminIds">
         delete
         from admin_priv
-        where admin_id = #{id,jdbcType=INTEGER}
+        where admin_id in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </delete>
 </mapper>

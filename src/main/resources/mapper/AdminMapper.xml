@@ -114,12 +114,12 @@
         </where>
     </select>
 
-    <!-- 根据code列表删除 -->
+    <!-- 根据id列表删除 -->
     <delete id="delete">
         delete
         from admin
-        where user_code in
-        <foreach item="item" index="index" collection="userCodes" open="(" separator="," close=")">
+        where user_code !='root' and id in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
             #{item}
         </foreach>
     </delete>

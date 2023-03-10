@@ -56,7 +56,7 @@ public class AdminController {
 
     @PostMapping("delete")
     @Privilege("delete")
-    public Integer deleteAdmin(@RequestBody List<String> userCodes) {
-        return adminService.delete(userCodes);
+    public Integer deleteAdmin(@RequestBody List<Integer> ids) {
+        return adminService.delete(ids);
     }
 }

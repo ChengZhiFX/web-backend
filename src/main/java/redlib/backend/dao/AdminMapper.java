@@ -26,7 +26,7 @@ public interface AdminMapper {
             @Param("offset") Integer offset,
             @Param("limit") Integer limit);
 
-    int delete(@Param("userCodes") List<String> userCodes);
+    int delete(@Param("ids") List<Integer> ids);
 
     Admin getByUserCode(String userCode);
 }

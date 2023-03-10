@@ -1,5 +1,6 @@
 package redlib.backend.dao;
 
+import org.apache.ibatis.annotations.Param;
 import redlib.backend.model.AdminPriv;
 
 import java.util.List;
@@ -15,5 +16,5 @@ public interface AdminPrivMapper {
 
     List<AdminPriv> list(Integer id);
 
-    void deleteByAdminId(Integer id);
+    void deleteByAdminIds(@Param("ids")List<Integer> ids);
 }
