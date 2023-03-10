@@ -156,7 +156,9 @@ public class AdminServiceImpl implements AdminService {
         BeanUtils.copyProperties(adminDTO, admin);
         admin.setUpdatedBy(token.getUserId());
         adminMapper.updateByPrimaryKey(admin);
-        adminPrivMapper.deleteByAdminId(admin.getId());
+        List<Integer> ids = new ArrayList<>();
+        ids.add(admin.getId());
+        adminPrivMapper.deleteByAdminIds(ids);
         updateOtherInfo(adminDTO);
         return admin.getId();
     }
@@ -180,13 +182,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Integer delete(List<String> userCodes) {
-        Assert.notEmpty(userCodes, "删除列表不能为空");
-        for (String userCode : userCodes) {
-            Assert.isTrue(!"root".equalsIgnoreCase(userCode), "不能删除超级管理员");
-        }
-
-        return adminMapper.delete(userCodes);
+    public Integer delete(List<Integer> ids) {
+        Assert.notEmpty(ids, "删除列表不能为空");
+        int size = adminMapper.delete(ids);
+        adminPrivMapper.deleteByAdminIds(ids);
+        return size;
     }
 
     @Override
