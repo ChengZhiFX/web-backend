@@ -1,5 +1,7 @@
 package redlib.backend.service.impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,16 +9,19 @@ import org.springframework.util.Assert;
 import redlib.backend.dao.DepartmentMapper;
 import redlib.backend.dto.DepartmentDTO;
 import redlib.backend.dto.query.DepartmentQueryDTO;
+import redlib.backend.dto.query.KeywordQueryDTO;
 import redlib.backend.model.Department;
 import redlib.backend.model.Page;
 import redlib.backend.model.Token;
 import redlib.backend.service.AdminService;
 import redlib.backend.service.DepartmentService;
 import redlib.backend.service.utils.DepartmentUtils;
+import redlib.backend.utils.ElasticUtils;
 import redlib.backend.utils.FormatUtils;
 import redlib.backend.utils.PageUtils;
 import redlib.backend.utils.ThreadContextHolder;
 import redlib.backend.vo.DepartmentVO;
+import redlib.backend.vo.LuceneResultBookVO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +38,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private ElasticsearchClient elasticsearchClient;
 
     /**
      * 分页获取部门信息
@@ -99,6 +107,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setUpdatedBy(token.getUserId());
         // 调用DAO方法保存到数据库表
         departmentMapper.insert(department);
+
+        // 新建elasticsearch索引
+        List<BulkOperation> bulkList = new ArrayList<>();
+        bulkList.add(ElasticUtils.addBulkBook(department.getId(), department.getDescription()));
+        ElasticUtils.bulkAddDocument(elasticsearchClient, bulkList);
         return department.getId();
     }
 
@@ -121,6 +134,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setUpdatedBy(token.getUserId());
         department.setUpdatedAt(new Date());
         departmentMapper.updateByPrimaryKey(department);
+        ElasticUtils.updateDocument(elasticsearchClient, department.getId(), department.getDescription());
         return department.getId();
     }
 
@@ -133,5 +147,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void deleteByCodes(List<Integer> ids) {
         Assert.notEmpty(ids, "部门id列表不能为空");
         departmentMapper.deleteByCodes(ids);
+        for (Integer id : ids) {
+            ElasticUtils.deleteDocument(elasticsearchClient, id);
+        }
+    }
+
+    @Override
+    public Page<LuceneResultBookVO> search(KeywordQueryDTO queryDTO) {
+        return ElasticUtils.query(elasticsearchClient, queryDTO);
     }
 }

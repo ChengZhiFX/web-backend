@@ -10,9 +10,11 @@ import redlib.backend.annotation.NeedNoPrivilege;
 import redlib.backend.annotation.Privilege;
 import redlib.backend.dto.DepartmentDTO;
 import redlib.backend.dto.query.DepartmentQueryDTO;
+import redlib.backend.dto.query.KeywordQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.service.DepartmentService;
 import redlib.backend.vo.DepartmentVO;
+import redlib.backend.vo.LuceneResultBookVO;
 
 import java.util.List;
 
@@ -59,5 +61,11 @@ public class DepartmentController {
     @NeedNoPrivilege
     public String getDepartmentByCode() {
         return "Hello,world";
+    }
+
+    @PostMapping("fullSearch")
+    @Privilege("page")
+    public Page<LuceneResultBookVO> search(@RequestBody KeywordQueryDTO queryDTO) {
+        return departmentService.search(queryDTO);
     }
 }

@@ -3,8 +3,10 @@ package redlib.backend.service;
 
 import redlib.backend.dto.DepartmentDTO;
 import redlib.backend.dto.query.DepartmentQueryDTO;
+import redlib.backend.dto.query.KeywordQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.vo.DepartmentVO;
+import redlib.backend.vo.LuceneResultBookVO;
 
 import java.util.List;
 
@@ -39,4 +41,6 @@ public interface DepartmentService {
      * @param ids 编码列表
      */
     void deleteByCodes(List<Integer> ids);
+
+    Page<LuceneResultBookVO> search(KeywordQueryDTO queryDTO);
 }

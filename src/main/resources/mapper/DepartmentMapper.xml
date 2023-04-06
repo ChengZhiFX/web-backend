@@ -25,7 +25,7 @@
         where id = #{id,jdbcType=INTEGER}
     </select>
 
-    <insert id="insert" parameterType="redlib.backend.model.Department">
+    <insert id="insert" parameterType="redlib.backend.model.Department" keyProperty="id" useGeneratedKeys="true">
         insert into department (id,
                                 department_name, contact, contact_phone,
                                 description, created_by, updated_by)
