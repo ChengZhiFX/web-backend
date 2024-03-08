@@ -1,12 +1,11 @@
 package redlib.backend.service;
 
 
+import org.apache.poi.ss.usermodel.Workbook;
 import redlib.backend.dto.DepartmentDTO;
 import redlib.backend.dto.query.DepartmentQueryDTO;
-import redlib.backend.dto.query.KeywordQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.vo.DepartmentVO;
-import redlib.backend.vo.LuceneResultBookVO;
 
 import java.util.List;
 
@@ -27,6 +26,8 @@ public interface DepartmentService {
      */
     Integer addDepartment(DepartmentDTO departmentDTO);
 
+    DepartmentDTO getById(Integer id);
+
     /**
      * 更新部门数据
      *
@@ -42,5 +43,5 @@ public interface DepartmentService {
      */
     void deleteByCodes(List<Integer> ids);
 
-    Page<LuceneResultBookVO> search(KeywordQueryDTO queryDTO);
+    Workbook export(DepartmentQueryDTO queryDTO);
 }

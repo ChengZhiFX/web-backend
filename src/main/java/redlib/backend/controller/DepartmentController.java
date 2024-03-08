@@ -1,21 +1,20 @@
 package redlib.backend.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import redlib.backend.annotation.BackendModule;
-import redlib.backend.annotation.NeedNoPrivilege;
 import redlib.backend.annotation.Privilege;
 import redlib.backend.dto.DepartmentDTO;
 import redlib.backend.dto.query.DepartmentQueryDTO;
-import redlib.backend.dto.query.KeywordQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.service.DepartmentService;
 import redlib.backend.vo.DepartmentVO;
-import redlib.backend.vo.LuceneResultBookVO;
 
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,21 +50,28 @@ public class DepartmentController {
         return departmentService.updateDepartment(departmentDTO);
     }
 
+    @GetMapping("getDepartment")
+    @Privilege("update")
+    public DepartmentDTO getDepartment(Integer id) {
+        return departmentService.getById(id);
+    }
+
     @PostMapping("deleteDepartment")
     @Privilege("delete")
     public void deleteDepartment(@RequestBody List<Integer> ids) {
         departmentService.deleteByCodes(ids);
     }
 
-    @PostMapping("getDepartmentByCode")
-    @NeedNoPrivilege
-    public String getDepartmentByCode() {
-        return "Hello,world";
-    }
-
-    @PostMapping("fullSearch")
+    @PostMapping("exportDepartment")
     @Privilege("page")
-    public Page<LuceneResultBookVO> search(@RequestBody KeywordQueryDTO queryDTO) {
-        return departmentService.search(queryDTO);
+    public void exportDepartment(@RequestBody DepartmentQueryDTO queryDTO, HttpServletResponse response) throws Exception {
+        Workbook workbook = departmentService.export(queryDTO);
+        response.setContentType("application/vnd.ms-excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
+        response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");
+        OutputStream os = response.getOutputStream();
+        workbook.write(os);
+        os.close();
+        workbook.close();
     }
 }

@@ -2,6 +2,7 @@ package redlib.backend.dto.query;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @author lihongwen
  * @date 2020/4/8
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class LoginLogQueryDTO extends PageQueryDTO {
     private String userCode;
