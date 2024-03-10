@@ -12,7 +12,7 @@
         </commentGenerator>
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/image_pro?serverTimezone=UTC"
+                        connectionURL="jdbc:mysql://localhost:3306/demo?serverTimezone=UTC"
                         userId="root" password="root">
             <property name="nullCatalogMeansCurrent" value="true"/>
         </jdbcConnection>
