@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
 import redlib.backend.annotation.Privilege;
 import redlib.backend.dto.ClassesDTO;
@@ -23,6 +24,7 @@ import java.util.List;
 public class ClassesController {
     @Autowired
     private ClassesService classesService;
+
     @PostMapping("listClasses")
     @Privilege("page")
     public Page<ClassesVO> listClasses(@RequestBody ClassesQueryDTO queryDTO) {
@@ -46,17 +48,19 @@ public class ClassesController {
     public ClassesDTO getAClass(Integer id) {
         return classesService.getById(id);
     }
+
     @PostMapping("deleteAClass")
     @Privilege("delete")
     public void deleteAClass(Integer id) {
         classesService.deleteById(id);
     }
+
     @PostMapping("deleteClasses")
     @Privilege("delete")
     public void deleteClasses(@RequestBody List<Integer> ids) {
         classesService.deleteByCodes(ids);
     }
-    /*
+
     @PostMapping("exportClasses")
     @Privilege("page")
     public void exportClasses(@RequestBody ClassesQueryDTO queryDTO, HttpServletResponse response) throws Exception {
@@ -69,5 +73,10 @@ public class ClassesController {
         os.close();
         workbook.close();
     }
-     */
+
+    @PostMapping("importClasses")
+    @Privilege("add")
+    public int importClasses(@RequestParam("file") MultipartFile file) throws Exception {
+        return classesService.importClasses(file.getInputStream(), file.getOriginalFilename());
+    }
 }

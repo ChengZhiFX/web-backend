@@ -127,7 +127,7 @@
       <if test="gender != null">
         and gender = #{gender}
       </if>
-      <if test="classId != null and classId != 0">
+      <if test="classId > 0">
         and class_id = #{classId}
       </if>
   </select>
@@ -146,7 +146,7 @@
     <if test="queryDTO.gender != null">
       and gender = #{queryDTO.gender}
     </if>
-    <if test="queryDTO.classId != null and queryDTO.classId != 0">
+    <if test="queryDTO.classId > 0">
       and class_id = #{queryDTO.classId}
     </if>
     limit #{offset}, #{limit}

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
 import redlib.backend.annotation.Privilege;
 import redlib.backend.dto.StudentsDTO;
@@ -53,7 +54,7 @@ public class StudentsController {
     public void deleteStudents(@RequestBody List<Integer> ids) {
         studentsService.deleteByCodes(ids);
     }
-/*
+
     @PostMapping("exportStudents")
     @Privilege("page")
     public void exportStudents(@RequestBody StudentsQueryDTO queryDTO, HttpServletResponse response) throws Exception {
@@ -66,5 +67,10 @@ public class StudentsController {
         os.close();
         workbook.close();
     }
- */
+
+    @PostMapping("importStudents")
+    @Privilege("add")
+    public int importStudents(@RequestParam("file") MultipartFile file) throws Exception {
+        return studentsService.importStudents(file.getInputStream(), file.getOriginalFilename());
+    }
 }

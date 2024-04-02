@@ -7,5 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class ScoreQueryDTO extends PageQueryDTO {
     private String studentNum;
+    private Integer academicYear;
+    private Integer semester;
     private Integer classId;
 }

@@ -146,7 +146,13 @@
     <if test="studentNum != null">
       and student_num = #{studentNum}
     </if>
-    <if test="classId != null and classId != 0">
+    <if test="academicYear > 0">
+      and academic_year = #{academicYear}
+    </if>
+    <if test="semester > 0">
+      and semester = #{semester}
+    </if>
+    <if test="classId > 0">
       and class_id = #{classId}
     </if>
   </select>
@@ -159,7 +165,13 @@
     <if test="queryDTO.studentNum != null">
       and student_num = #{queryDTO.studentNum}
     </if>
-    <if test="queryDTO.classId != null and queryDTO.classId != 0">
+    <if test="queryDTO.academicYear > 0">
+      and academic_year = #{queryDTO.academicYear}
+    </if>
+    <if test="queryDTO.semester > 0">
+      and semester = #{queryDTO.semester}
+    </if>
+    <if test="queryDTO.classId > 0">
       and class_id = #{queryDTO.classId}
     </if>
     limit #{offset}, #{limit}
@@ -173,4 +185,35 @@
       #{item}
     </foreach>
   </update>
+
+  <select id="getAverageOfClass" resultType="java.util.Map">
+    select class_id,avg(chinese_score),avg(math_score),avg(english_score)
+    from score
+    where 1
+    <if test="academicYear > 0">
+      and academic_year = #{academicYear}
+    </if>
+    <if test="semester > 0">
+      and semester = #{semester}
+    </if>
+    group by class_id
+  </select>
+
+  <select id="getAverageSelective" resultType="java.util.Map">
+    select avg(chinese_score),avg(math_score),avg(english_score)
+    from score
+    where 1
+    <if test="studentNum != null">
+      and student_num = #{studentNum}
+    </if>
+    <if test="academicYear > 0">
+      and academic_year = #{academicYear}
+    </if>
+    <if test="semester > 0">
+      and semester = #{semester}
+    </if>
+    <if test="classId > 0">
+      and class_id = #{classId}
+    </if>
+  </select>
 </mapper>

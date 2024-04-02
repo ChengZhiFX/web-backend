@@ -23,7 +23,7 @@ public class Students {
     /**
      * 
      */
-    private Boolean gender;
+    private Integer gender;
 
     /**
      * 

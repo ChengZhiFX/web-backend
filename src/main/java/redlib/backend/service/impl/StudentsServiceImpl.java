@@ -10,21 +10,20 @@ import redlib.backend.dto.StudentsDTO;
 import redlib.backend.dto.query.StudentsQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.model.Students;
-import redlib.backend.model.Token;
-import redlib.backend.service.AdminService;
 import redlib.backend.service.StudentsService;
 import redlib.backend.service.utils.StudentsUtils;
 import redlib.backend.utils.FormatUtils;
 import redlib.backend.utils.PageUtils;
-import redlib.backend.utils.ThreadContextHolder;
 import redlib.backend.utils.XlsUtils;
 import redlib.backend.vo.StudentsVO;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class StudentsServiceImpl implements StudentsService {
@@ -61,7 +60,6 @@ public class StudentsServiceImpl implements StudentsService {
     }
     @Override
     public Integer addStudent(StudentsDTO studentsDTO) {
-        Token token = ThreadContextHolder.getToken();
         // 创建实体对象，用以保存到数据库
         Students students = new Students();
         // 将输入的字段全部复制到实体对象中
@@ -99,7 +97,7 @@ public class StudentsServiceImpl implements StudentsService {
         Assert.notEmpty(ids, "id列表不能为空");
         studentsMapper.deleteByCodes(ids);
     }
-/*
+
     @Override
     public Workbook export(StudentsQueryDTO queryDTO) {
         queryDTO.setPageSize(100);
@@ -110,9 +108,9 @@ public class StudentsServiceImpl implements StudentsService {
         map.put("gender", "性别");
         map.put("parentName", "家长姓名");
         map.put("parentTel", "家长电话");
-        map.put("classId", "班级ID");
+        map.put("classId", "班级号");
         final AtomicBoolean finalPage = new AtomicBoolean(false);
-        Workbook workbook = XlsUtils.exportToExcel(page -> {
+        return XlsUtils.exportToExcel(page -> {
             if (finalPage.get()) {
                 return null;
             }
@@ -123,9 +121,24 @@ public class StudentsServiceImpl implements StudentsService {
             }
             return list;
         }, map);
-
-        return workbook;
     }
-
- */
+    
+    @Override
+    public int importStudents(InputStream inputStream, String fileName) throws Exception {
+        Assert.hasText(fileName, "文件名不能为空");
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("ID", "id");
+        map.put("姓名", "studentName");
+        map.put("学号", "studentNum");
+        map.put("性别", "gender");
+        map.put("家长姓名", "parentName");
+        map.put("家长电话", "parentTel");
+        map.put("班级号", "classId");
+        AtomicInteger row = new AtomicInteger(0);
+        XlsUtils.importFromExcel(inputStream, fileName, (studentsDTO) -> {
+            addStudent(studentsDTO);
+            row.incrementAndGet();
+        }, map, StudentsDTO.class);
+        return row.get();
+    }
 }

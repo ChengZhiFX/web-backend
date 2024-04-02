@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 public class StudentsQueryDTO extends PageQueryDTO {
     private String studentName;
     private String studentNum;
-    private Boolean gender;
+    private Integer gender;
     private Integer classId;
 }

@@ -1,33 +1,37 @@
 package redlib.backend.service.impl;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import redlib.backend.dao.ScoreMapper;
+import redlib.backend.dto.AverageDTO;
+import redlib.backend.vo.AverageVO;
 import redlib.backend.dto.ScoreDTO;
 import redlib.backend.dto.query.ScoreQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.model.Score;
 import redlib.backend.model.Token;
-import redlib.backend.service.AdminService;
 import redlib.backend.service.ScoreService;
 import redlib.backend.service.utils.ScoreUtils;
-import redlib.backend.utils.FormatUtils;
 import redlib.backend.utils.PageUtils;
 import redlib.backend.utils.ThreadContextHolder;
+import redlib.backend.utils.XlsUtils;
 import redlib.backend.vo.ScoreVO;
 
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
 
     @Autowired
     private ScoreMapper scoreMapper;
-    @Autowired
-    private AdminService adminService;
+
     @Override
     public Page<ScoreVO> listByPage(ScoreQueryDTO queryDTO) {
         if (queryDTO == null) {
@@ -58,8 +62,6 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public Integer addScore(ScoreDTO scoreDTO) {
-        Token token = ThreadContextHolder.getToken();
-        // 创建实体对象，用以保存到数据库
         Score score = new Score();
         // 将输入的字段全部复制到实体对象中
         BeanUtils.copyProperties(scoreDTO, score);
@@ -97,12 +99,69 @@ public class ScoreServiceImpl implements ScoreService {
         Assert.notEmpty(ids, "id列表不能为空");
         scoreMapper.deleteByCodes(ids);
     }
-/*
+
     @Override
-    public List<Score> getScoresByAcademicYearAndSemester(Short academicYear, Byte semester) {
-        return scoreMapper.getScoresByAcademicYearAndSemester(academicYear, semester);
+    public Workbook export(ScoreQueryDTO queryDTO) {
+        queryDTO.setPageSize(100);
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", "流水号");
+        map.put("studentNum", "学号");
+        map.put("chineseScore", "语文成绩");
+        map.put("mathScore", "数学成绩");
+        map.put("englishScore", "英语成绩");
+        map.put("entryEvent", "录入时间");
+        map.put("academicYear", "学年");
+        map.put("semester", "学期");
+        map.put("classId", "班级号");
+        final AtomicBoolean finalPage = new AtomicBoolean(false);
+        return XlsUtils.exportToExcel(page -> {
+            if (finalPage.get()) {
+                return null;
+            }
+            queryDTO.setCurrent(page);
+            List<ScoreVO> list = listByPage(queryDTO).getList();
+            if (list.size() != 100) {
+                finalPage.set(true);
+            }
+            return list;
+        }, map);
     }
 
+    @Override
+    public int importScores(InputStream inputStream, String fileName) throws Exception {
+        Assert.hasText(fileName, "文件名不能为空");
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("流水号", "id");
+        map.put("学号", "studentNum");
+        map.put("语文成绩", "chineseScore");
+        map.put("数学成绩", "mathScore");
+        map.put("英语成绩", "englishScore");
+        map.put("学年", "academicYear");
+        map.put("学期", "semester");
+        map.put("班级号", "classId");
+        AtomicInteger row = new AtomicInteger(0);
+        XlsUtils.importFromExcel(inputStream, fileName, (scoreDTO) -> {
+            addScore(scoreDTO);
+            row.incrementAndGet();
+        }, map, ScoreDTO.class);
+        return row.get();
+    }
+
+    @Override
+    public List<AverageVO> getAverageOfClass(AverageDTO averageDTO) {
+        List<Map> list = scoreMapper.getAverageOfClass(averageDTO);
+        List<AverageVO> voList = new ArrayList<>();
+        for (Map map : list) {
+            AverageVO vo = new AverageVO();
+            vo.setClassId((Integer) map.get("class_id"));
+            vo.setAverageChineseScore(((BigDecimal) map.get("avg(chinese_score)")).floatValue());
+            vo.setAverageMathScore(((BigDecimal) map.get("avg(math_score)")).floatValue());
+            vo.setAverageEnglishScore(((BigDecimal) map.get("avg(english_score)")).floatValue());
+            voList.add(vo);
+        }
+        return voList;
+    }
+/*
     @Override
     public List<Score> getScoresByClass(Integer classId) {
         return null;
