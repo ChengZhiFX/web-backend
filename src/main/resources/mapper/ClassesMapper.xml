@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="redlib.backend.dao.ClassesMapper">
+  <resultMap id="BaseResultMap" type="redlib.backend.model.Classes">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="class_name" jdbcType="VARCHAR" property="className" />
+    <result column="chinese_teacher" jdbcType="VARCHAR" property="chineseTeacher" />
+    <result column="math_teacher" jdbcType="VARCHAR" property="mathTeacher" />
+    <result column="english_teacher" jdbcType="VARCHAR" property="englishTeacher" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, class_name, chinese_teacher, math_teacher, english_teacher
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from classes
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from classes
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="redlib.backend.model.Classes">
+    insert into classes (id, class_name, chinese_teacher, 
+      math_teacher, english_teacher)
+    values (#{id,jdbcType=INTEGER}, #{className,jdbcType=VARCHAR}, #{chineseTeacher,jdbcType=VARCHAR}, 
+      #{mathTeacher,jdbcType=VARCHAR}, #{englishTeacher,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="redlib.backend.model.Classes">
+    insert into classes
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="className != null">
+        class_name,
+      </if>
+      <if test="chineseTeacher != null">
+        chinese_teacher,
+      </if>
+      <if test="mathTeacher != null">
+        math_teacher,
+      </if>
+      <if test="englishTeacher != null">
+        english_teacher,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="className != null">
+        #{className,jdbcType=VARCHAR},
+      </if>
+      <if test="chineseTeacher != null">
+        #{chineseTeacher,jdbcType=VARCHAR},
+      </if>
+      <if test="mathTeacher != null">
+        #{mathTeacher,jdbcType=VARCHAR},
+      </if>
+      <if test="englishTeacher != null">
+        #{englishTeacher,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="redlib.backend.model.Classes">
+    update classes
+    <set>
+      <if test="className != null">
+        class_name = #{className,jdbcType=VARCHAR},
+      </if>
+      <if test="chineseTeacher != null">
+        chinese_teacher = #{chineseTeacher,jdbcType=VARCHAR},
+      </if>
+      <if test="mathTeacher != null">
+        math_teacher = #{mathTeacher,jdbcType=VARCHAR},
+      </if>
+      <if test="englishTeacher != null">
+        english_teacher = #{englishTeacher,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Classes">
+    update classes
+    set class_name = #{className,jdbcType=VARCHAR},
+      chinese_teacher = #{chineseTeacher,jdbcType=VARCHAR},
+      math_teacher = #{mathTeacher,jdbcType=VARCHAR},
+      english_teacher = #{englishTeacher,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="count" resultType="integer">
+    select count(*) from classes
+    where 1
+    <if test="chineseTeacher != null">
+      and chinese_teacher like #{chineseTeacher}
+    </if>
+    <if test="mathTeacher != null">
+      and math_teacher = #{mathTeacher}
+    </if>
+    <if test="englishTeacher != null">
+      and english_teacher = #{englishTeacher}
+    </if>
+  </select>
+
+  <select id="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from classes
+    where 1
+    <if test="queryDTO.chineseTeacher != null">
+      and chinese_teacher like #{queryDTO.chineseTeacher}
+    </if>
+    <if test="queryDTO.mathTeacher != null">
+      and math_teacher like #{queryDTO.mathTeacher}
+    </if>
+    <if test="queryDTO.englishTeacher != null">
+      and english_teacher like #{queryDTO.englishTeacher}
+    </if>
+    limit #{offset}, #{limit}
+  </select>
+
+  <update id="deleteByCodes">
+    delete from classes
+    where id in
+    <foreach close=")" collection="codeList" index="index" item="item" open="(" separator=",">
+      #{item}
+    </foreach>
+  </update>
+</mapper>

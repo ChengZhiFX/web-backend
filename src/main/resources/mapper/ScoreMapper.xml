@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="redlib.backend.dao.ScoreMapper">
+  <resultMap id="BaseResultMap" type="redlib.backend.model.Score">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_num" jdbcType="VARCHAR" property="studentNum" />
+    <result column="chinese_score" jdbcType="TINYINT" property="chineseScore" />
+    <result column="math_score" jdbcType="TINYINT" property="mathScore" />
+    <result column="english_score" jdbcType="TINYINT" property="englishScore" />
+    <result column="entry_event" jdbcType="TIMESTAMP" property="entryEvent" />
+    <result column="academic_year" jdbcType="SMALLINT" property="academicYear" />
+    <result column="semester" jdbcType="TINYINT" property="semester" />
+    <result column="class_id" jdbcType="INTEGER" property="classId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, student_num, chinese_score, math_score, english_score, entry_event, academic_year, 
+    semester, class_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from score
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from score
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="redlib.backend.model.Score">
+    insert into score (id, student_num, chinese_score, 
+      math_score, english_score, entry_event, 
+      academic_year, semester, class_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=VARCHAR}, #{chineseScore,jdbcType=TINYINT}, 
+      #{mathScore,jdbcType=TINYINT}, #{englishScore,jdbcType=TINYINT}, #{entryEvent,jdbcType=TIMESTAMP}, 
+      #{academicYear,jdbcType=SMALLINT}, #{semester,jdbcType=TINYINT}, #{classId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="redlib.backend.model.Score">
+    insert into score
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="studentNum != null">
+        student_num,
+      </if>
+      <if test="chineseScore != null">
+        chinese_score,
+      </if>
+      <if test="mathScore != null">
+        math_score,
+      </if>
+      <if test="englishScore != null">
+        english_score,
+      </if>
+      <if test="entryEvent != null">
+        entry_event,
+      </if>
+      <if test="academicYear != null">
+        academic_year,
+      </if>
+      <if test="semester != null">
+        semester,
+      </if>
+      <if test="classId != null">
+        class_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="studentNum != null">
+        #{studentNum,jdbcType=VARCHAR},
+      </if>
+      <if test="chineseScore != null">
+        #{chineseScore,jdbcType=TINYINT},
+      </if>
+      <if test="mathScore != null">
+        #{mathScore,jdbcType=TINYINT},
+      </if>
+      <if test="englishScore != null">
+        #{englishScore,jdbcType=TINYINT},
+      </if>
+      <if test="entryEvent != null">
+        #{entryEvent,jdbcType=TIMESTAMP},
+      </if>
+      <if test="academicYear != null">
+        #{academicYear,jdbcType=SMALLINT},
+      </if>
+      <if test="semester != null">
+        #{semester,jdbcType=TINYINT},
+      </if>
+      <if test="classId != null">
+        #{classId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="redlib.backend.model.Score">
+    update score
+    <set>
+      <if test="studentNum != null">
+        student_num = #{studentNum,jdbcType=VARCHAR},
+      </if>
+      <if test="chineseScore != null">
+        chinese_score = #{chineseScore,jdbcType=TINYINT},
+      </if>
+      <if test="mathScore != null">
+        math_score = #{mathScore,jdbcType=TINYINT},
+      </if>
+      <if test="englishScore != null">
+        english_score = #{englishScore,jdbcType=TINYINT},
+      </if>
+      <if test="entryEvent != null">
+        entry_event = #{entryEvent,jdbcType=TIMESTAMP},
+      </if>
+      <if test="academicYear != null">
+        academic_year = #{academicYear,jdbcType=SMALLINT},
+      </if>
+      <if test="semester != null">
+        semester = #{semester,jdbcType=TINYINT},
+      </if>
+      <if test="classId != null">
+        class_id = #{classId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Score">
+    update score
+    set student_num = #{studentNum,jdbcType=VARCHAR},
+      chinese_score = #{chineseScore,jdbcType=TINYINT},
+      math_score = #{mathScore,jdbcType=TINYINT},
+      english_score = #{englishScore,jdbcType=TINYINT},
+      entry_event = #{entryEvent,jdbcType=TIMESTAMP},
+      academic_year = #{academicYear,jdbcType=SMALLINT},
+      semester = #{semester,jdbcType=TINYINT},
+      class_id = #{classId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="count" resultType="integer">
+    select count(*) from score
+    where 1
+    <if test="studentNum != null">
+      and student_num = #{studentNum}
+    </if>
+    <if test="classId != null and classId != 0">
+      and class_id = #{classId}
+    </if>
+  </select>
+
+  <select id="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from score
+    where 1
+    <if test="queryDTO.studentNum != null">
+      and student_num = #{queryDTO.studentNum}
+    </if>
+    <if test="queryDTO.classId != null and queryDTO.classId != 0">
+      and class_id = #{queryDTO.classId}
+    </if>
+    limit #{offset}, #{limit}
+  </select>
+
+  <!-- 批量删除 -->
+  <update id="deleteByCodes">
+    delete from score
+    where id in
+    <foreach close=")" collection="codeList" index="index" item="item" open="(" separator=",">
+      #{item}
+    </foreach>
+  </update>
+</mapper>
