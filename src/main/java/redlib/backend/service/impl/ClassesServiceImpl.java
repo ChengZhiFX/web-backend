@@ -11,6 +11,7 @@ import redlib.backend.dto.query.ClassesQueryDTO;
 import redlib.backend.model.Classes;
 import redlib.backend.model.Page;
 import redlib.backend.service.ClassesService;
+import redlib.backend.service.StudentsService;
 import redlib.backend.service.utils.ClassesUtils;
 import redlib.backend.utils.FormatUtils;
 import redlib.backend.utils.PageUtils;
@@ -30,6 +31,9 @@ public class ClassesServiceImpl implements ClassesService {
 
     @Autowired
     private ClassesMapper classesMapper;
+    @Autowired
+    private StudentsService studentsService;
+
     @Override
     public Page<ClassesVO> listByPage(ClassesQueryDTO queryDTO) {
         Assert.notNull(queryDTO, "查询参数不能为空");
@@ -46,6 +50,7 @@ public class ClassesServiceImpl implements ClassesService {
         List<ClassesVO> voList = new ArrayList<>();
         for (Classes classes : list) {
             ClassesVO vo = ClassesUtils.convertToVO(classes);
+            vo.setTotalStudents(studentsService.getTotalOfStudents(vo.getId()));
             voList.add(vo);
         }
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);

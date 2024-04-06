@@ -7,12 +7,12 @@ import java.util.Date;
 @Data
 public class ScoreVO {
     private Integer id;
-    private String studentNum;
-    private Integer chineseScore;
-    private Integer mathScore;
-    private Integer englishScore;
+    private Long studentNum;
+    private Byte chineseScore;
+    private Byte mathScore;
+    private Byte englishScore;
     private Date entryEvent;
-    private Integer academicYear;
-    private Integer semester;
+    private Short academicYear;
+    private Byte semester;
     private Integer classId;
 }

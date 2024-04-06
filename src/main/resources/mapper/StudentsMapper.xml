@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="redlib.backend.model.Students">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="student_name" jdbcType="VARCHAR" property="studentName" />
-    <result column="student_num" jdbcType="VARCHAR" property="studentNum" />
+    <result column="student_num" jdbcType="INTEGER" property="studentNum" />
     <result column="gender" jdbcType="TINYINT" property="gender" />
     <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
     <result column="parent_tel" jdbcType="VARCHAR" property="parentTel" />
@@ -27,7 +27,7 @@
     insert into students (id, student_name, student_num, 
       gender, parent_name, parent_tel, 
       class_id)
-    values (#{id,jdbcType=INTEGER}, #{studentName,jdbcType=VARCHAR}, #{studentNum,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{studentName,jdbcType=VARCHAR}, #{studentNum,jdbcType=INTEGER}, 
       #{gender,jdbcType=TINYINT}, #{parentName,jdbcType=VARCHAR}, #{parentTel,jdbcType=VARCHAR}, 
       #{classId,jdbcType=INTEGER})
   </insert>
@@ -64,7 +64,7 @@
         #{studentName,jdbcType=VARCHAR},
       </if>
       <if test="studentNum != null">
-        #{studentNum,jdbcType=VARCHAR},
+        #{studentNum,jdbcType=INTEGER},
       </if>
       <if test="gender != null">
         #{gender,jdbcType=TINYINT},
@@ -87,7 +87,7 @@
         student_name = #{studentName,jdbcType=VARCHAR},
       </if>
       <if test="studentNum != null">
-        student_num = #{studentNum,jdbcType=VARCHAR},
+        student_num = #{studentNum,jdbcType=INTEGER},
       </if>
       <if test="gender != null">
         gender = #{gender,jdbcType=TINYINT},
@@ -107,7 +107,7 @@
   <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Students">
     update students
     set student_name = #{studentName,jdbcType=VARCHAR},
-      student_num = #{studentNum,jdbcType=VARCHAR},
+      student_num = #{studentNum,jdbcType=INTEGER},
       gender = #{gender,jdbcType=TINYINT},
       parent_name = #{parentName,jdbcType=VARCHAR},
       parent_tel = #{parentTel,jdbcType=VARCHAR},
@@ -121,7 +121,7 @@
       <if test="studentName != null">
         and student_name like #{studentName}
       </if>
-      <if test="studentNum != null">
+      <if test="studentNum > 0">
         and student_num = #{studentNum}
       </if>
       <if test="gender != null">
@@ -134,13 +134,13 @@
 
   <select id="list" resultMap="BaseResultMap">
     select
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     from students
     where 1
     <if test="queryDTO.studentName != null">
       and student_name like #{queryDTO.studentName}
     </if>
-    <if test="queryDTO.studentNum != null">
+    <if test="queryDTO.studentNum > 0">
       and student_num = #{queryDTO.studentNum}
     </if>
     <if test="queryDTO.gender != null">
@@ -162,7 +162,7 @@
   <update id="deleteByCodes">
     delete from students
     where id in
-    <foreach item="item" index="index" collection="codeList" open="(" separator="," close=")">
+    <foreach close=")" collection="codeList" index="index" item="item" open="(" separator=",">
       #{item}
     </foreach>
   </update>

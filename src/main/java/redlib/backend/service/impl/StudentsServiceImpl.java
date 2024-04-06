@@ -149,4 +149,11 @@ public class StudentsServiceImpl implements StudentsService {
         map.put("classId", "班级号");
         return XlsUtils.exportToExcel(page -> new ArrayList<StudentsDTO>(), map);
     }
+
+    @Override
+    public int getTotalOfStudents(Integer classId) {
+        StudentsQueryDTO queryDTO = new StudentsQueryDTO();
+        queryDTO.setClassId(classId);
+        return studentsMapper.count(queryDTO);
+    }
 }

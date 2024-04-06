@@ -9,4 +9,5 @@ public class ClassesVO {
     private String chineseTeacher;
     private String mathTeacher;
     private String englishTeacher;
+    private Integer totalStudents;
 }

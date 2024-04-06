@@ -16,7 +16,6 @@ public class ScoreUtils {
     public static void validateScore(ScoreDTO scoreDTO) {
         FormatUtils.trimFieldToNull(scoreDTO);
         Assert.notNull(scoreDTO, "输入数据不能为空");
-        Assert.hasText(scoreDTO.getStudentNum(), "名称不能为空");
     }
 
     /**

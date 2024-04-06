@@ -5,7 +5,7 @@ use demo;
 create table students(
     id int not null primary key auto_increment,
     student_name varchar(20) not null,
-    student_num varchar(12) not null unique,
+    student_num int not null unique,
     gender tinyint not null,
     parent_name varchar(20),
     parent_tel varchar(11),
@@ -22,7 +22,7 @@ create table classes(
 
 create table score(
     id int not null primary key auto_increment,
-    student_num varchar(12) not null,
+    student_num int not null,
     chinese_score tinyint default 0,
     math_score tinyint default 0,
     english_score tinyint default 0,

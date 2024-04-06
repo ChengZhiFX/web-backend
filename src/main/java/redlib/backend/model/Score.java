@@ -7,7 +7,7 @@ import lombok.Data;
  * 描述:score表的实体类
  * @version
  * @author:  Colorange
- * @创建时间: 2024-04-01
+ * @创建时间: 2024-04-06
  */
 @Data
 public class Score {
@@ -19,22 +19,22 @@ public class Score {
     /**
      * 
      */
-    private String studentNum;
+    private Long studentNum;
 
     /**
      * 
      */
-    private Integer chineseScore;
+    private Byte chineseScore;
 
     /**
      * 
      */
-    private Integer mathScore;
+    private Byte mathScore;
 
     /**
      * 
      */
-    private Integer englishScore;
+    private Byte englishScore;
 
     /**
      * 
@@ -44,12 +44,12 @@ public class Score {
     /**
      * 
      */
-    private Integer academicYear;
+    private Short academicYear;
 
     /**
      * 
      */
-    private Integer semester;
+    private Byte semester;
 
     /**
      * 

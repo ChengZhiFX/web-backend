@@ -11,6 +11,7 @@ import redlib.backend.dto.ClassesDTO;
 import redlib.backend.dto.query.ClassesQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.service.ClassesService;
+import redlib.backend.service.StudentsService;
 import redlib.backend.vo.ClassesVO;
 
 import java.io.OutputStream;
@@ -24,6 +25,8 @@ import java.util.List;
 public class ClassesController {
     @Autowired
     private ClassesService classesService;
+    @Autowired
+    private StudentsService studentsService;
 
     @PostMapping("listClasses")
     @Privilege("page")
@@ -92,4 +95,10 @@ public class ClassesController {
         os.close();
         workbook.close();
     }
+//
+//    @PostMapping("getTotalOfStudents")
+//    @Privilege("page")
+//    public int getTotalOfStudents(Integer classId) {
+//        return studentsService.getTotalOfStudents(classId);
+//    }
 }

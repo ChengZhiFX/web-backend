@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ScoreDTO {
     private Integer id;
-    private String studentNum;
+    private Integer studentNum;
     private Integer chineseScore;
     private Integer mathScore;
     private Integer englishScore;

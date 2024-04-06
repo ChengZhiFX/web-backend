@@ -3,7 +3,7 @@
 <mapper namespace="redlib.backend.dao.ScoreMapper">
   <resultMap id="BaseResultMap" type="redlib.backend.model.Score">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="student_num" jdbcType="VARCHAR" property="studentNum" />
+    <result column="student_num" jdbcType="BIGINT" property="studentNum" />
     <result column="chinese_score" jdbcType="TINYINT" property="chineseScore" />
     <result column="math_score" jdbcType="TINYINT" property="mathScore" />
     <result column="english_score" jdbcType="TINYINT" property="englishScore" />
@@ -31,7 +31,7 @@
       math_score, english_score, entry_event, 
       academic_year, semester, class_id
       )
-    values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=VARCHAR}, #{chineseScore,jdbcType=TINYINT}, 
+    values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=BIGINT}, #{chineseScore,jdbcType=TINYINT}, 
       #{mathScore,jdbcType=TINYINT}, #{englishScore,jdbcType=TINYINT}, #{entryEvent,jdbcType=TIMESTAMP}, 
       #{academicYear,jdbcType=SMALLINT}, #{semester,jdbcType=TINYINT}, #{classId,jdbcType=INTEGER}
       )
@@ -72,7 +72,7 @@
         #{id,jdbcType=INTEGER},
       </if>
       <if test="studentNum != null">
-        #{studentNum,jdbcType=VARCHAR},
+        #{studentNum,jdbcType=BIGINT},
       </if>
       <if test="chineseScore != null">
         #{chineseScore,jdbcType=TINYINT},
@@ -101,7 +101,7 @@
     update score
     <set>
       <if test="studentNum != null">
-        student_num = #{studentNum,jdbcType=VARCHAR},
+        student_num = #{studentNum,jdbcType=BIGINT},
       </if>
       <if test="chineseScore != null">
         chinese_score = #{chineseScore,jdbcType=TINYINT},
@@ -129,7 +129,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Score">
     update score
-    set student_num = #{studentNum,jdbcType=VARCHAR},
+    set student_num = #{studentNum,jdbcType=BIGINT},
       chinese_score = #{chineseScore,jdbcType=TINYINT},
       math_score = #{mathScore,jdbcType=TINYINT},
       english_score = #{englishScore,jdbcType=TINYINT},
@@ -143,7 +143,7 @@
   <select id="count" resultType="integer">
     select count(*) from score
     where 1
-    <if test="studentNum != null">
+    <if test="studentNum > 0">
       and student_num = #{studentNum}
     </if>
     <if test="academicYear > 0">
@@ -162,7 +162,7 @@
     <include refid="Base_Column_List" />
     from score
     where 1
-    <if test="queryDTO.studentNum != null">
+    <if test="queryDTO.studentNum > 0">
       and student_num = #{queryDTO.studentNum}
     </if>
     <if test="queryDTO.academicYear > 0">
@@ -209,7 +209,7 @@
     select avg(chinese_score),avg(math_score),avg(english_score)
     from score
     where 1
-    <if test="studentNum != null">
+    <if test="studentNum > 0">
       and student_num = #{studentNum}
     </if>
     <if test="academicYear > 0">

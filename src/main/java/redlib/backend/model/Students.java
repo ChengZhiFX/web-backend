@@ -18,7 +18,7 @@ public class Students {
     /**
      * 
      */
-    private String studentNum;
+    private Integer studentNum;
 
     /**
      * 
