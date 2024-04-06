@@ -3,7 +3,7 @@
 <mapper namespace="redlib.backend.dao.ScoreMapper">
   <resultMap id="BaseResultMap" type="redlib.backend.model.Score">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="student_num" jdbcType="BIGINT" property="studentNum" />
+    <result column="student_num" jdbcType="INTEGER" property="studentNum" />
     <result column="chinese_score" jdbcType="TINYINT" property="chineseScore" />
     <result column="math_score" jdbcType="TINYINT" property="mathScore" />
     <result column="english_score" jdbcType="TINYINT" property="englishScore" />
@@ -31,7 +31,7 @@
       math_score, english_score, entry_event, 
       academic_year, semester, class_id
       )
-    values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=BIGINT}, #{chineseScore,jdbcType=TINYINT}, 
+    values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=INTEGER}, #{chineseScore,jdbcType=TINYINT}, 
       #{mathScore,jdbcType=TINYINT}, #{englishScore,jdbcType=TINYINT}, #{entryEvent,jdbcType=TIMESTAMP}, 
       #{academicYear,jdbcType=SMALLINT}, #{semester,jdbcType=TINYINT}, #{classId,jdbcType=INTEGER}
       )
@@ -72,7 +72,7 @@
         #{id,jdbcType=INTEGER},
       </if>
       <if test="studentNum != null">
-        #{studentNum,jdbcType=BIGINT},
+        #{studentNum,jdbcType=INTEGER},
       </if>
       <if test="chineseScore != null">
         #{chineseScore,jdbcType=TINYINT},
@@ -101,7 +101,7 @@
     update score
     <set>
       <if test="studentNum != null">
-        student_num = #{studentNum,jdbcType=BIGINT},
+        student_num = #{studentNum,jdbcType=INTEGER},
       </if>
       <if test="chineseScore != null">
         chinese_score = #{chineseScore,jdbcType=TINYINT},
@@ -129,7 +129,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="redlib.backend.model.Score">
     update score
-    set student_num = #{studentNum,jdbcType=BIGINT},
+    set student_num = #{studentNum,jdbcType=INTEGER},
       chinese_score = #{chineseScore,jdbcType=TINYINT},
       math_score = #{mathScore,jdbcType=TINYINT},
       english_score = #{englishScore,jdbcType=TINYINT},

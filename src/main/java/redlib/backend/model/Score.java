@@ -19,22 +19,22 @@ public class Score {
     /**
      * 
      */
-    private Long studentNum;
+    private Integer studentNum;
 
     /**
      * 
      */
-    private Byte chineseScore;
+    private Integer chineseScore;
 
     /**
      * 
      */
-    private Byte mathScore;
+    private Integer mathScore;
 
     /**
      * 
      */
-    private Byte englishScore;
+    private Integer englishScore;
 
     /**
      * 
@@ -44,12 +44,12 @@ public class Score {
     /**
      * 
      */
-    private Short academicYear;
+    private Integer academicYear;
 
     /**
      * 
      */
-    private Byte semester;
+    private Integer semester;
 
     /**
      * 
