@@ -18,4 +18,5 @@ public interface ClassesService {
     void deleteByCodes(List<Integer> ids);
     Workbook export(ClassesQueryDTO queryDTO);
     int importClasses(InputStream inputStream, String fileName) throws Exception;
+    Workbook exportTemplate();
 }

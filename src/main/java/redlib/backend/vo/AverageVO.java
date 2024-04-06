@@ -8,4 +8,5 @@ public class AverageVO {
     private Float averageChineseScore;
     private Float averageMathScore;
     private Float averageEnglishScore;
+    private Float averageTotalScore;
 }

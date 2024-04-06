@@ -79,4 +79,17 @@ public class ClassesController {
     public int importClasses(@RequestParam("file") MultipartFile file) throws Exception {
         return classesService.importClasses(file.getInputStream(), file.getOriginalFilename());
     }
+
+    @PostMapping("exportClassesTemplate")
+    @Privilege("page")
+    public void exportClassesTemplate(HttpServletResponse response) throws Exception {
+        Workbook workbook = classesService.exportTemplate();
+        response.setContentType("application/vnd.ms-excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
+        response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");
+        OutputStream os = response.getOutputStream();
+        workbook.write(os);
+        os.close();
+        workbook.close();
+    }
 }

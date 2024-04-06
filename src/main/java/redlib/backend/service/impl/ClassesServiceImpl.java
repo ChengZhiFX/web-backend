@@ -12,6 +12,7 @@ import redlib.backend.model.Classes;
 import redlib.backend.model.Page;
 import redlib.backend.service.ClassesService;
 import redlib.backend.service.utils.ClassesUtils;
+import redlib.backend.utils.FormatUtils;
 import redlib.backend.utils.PageUtils;
 import redlib.backend.utils.XlsUtils;
 import redlib.backend.vo.ClassesVO;
@@ -31,13 +32,13 @@ public class ClassesServiceImpl implements ClassesService {
     private ClassesMapper classesMapper;
     @Override
     public Page<ClassesVO> listByPage(ClassesQueryDTO queryDTO) {
-        if (queryDTO == null) {
-            queryDTO = new ClassesQueryDTO();
-        }
+        Assert.notNull(queryDTO, "查询参数不能为空");
+        FormatUtils.trimFieldToNull(queryDTO);
+        queryDTO.setOrderBy(FormatUtils.formatOrderBy(queryDTO.getOrderBy()));
+
         Integer size = classesMapper.count(queryDTO);
         PageUtils pageUtils = new PageUtils(queryDTO.getCurrent(), queryDTO.getPageSize(), size);
-        if (size == 0) {
-            // 没有命中，则返回空数据。
+        if (pageUtils.isDataEmpty()) {
             return pageUtils.getNullPage();
         }
         // 利用myBatis到数据库中查询数据，以分页的方式
@@ -132,5 +133,16 @@ public class ClassesServiceImpl implements ClassesService {
             row.incrementAndGet();
         }, map, ClassesDTO.class);
         return row.get();
+    }
+
+    @Override
+    public Workbook exportTemplate() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", "班级号");
+        map.put("className", "班级名称");
+        map.put("chineseTeacher", "语文教师");
+        map.put("mathTeacher", "数学教师");
+        map.put("englishTeacher", "英语教师");
+        return XlsUtils.exportToExcel(page -> new ArrayList<ClassesDTO>(), map);
     }
 }

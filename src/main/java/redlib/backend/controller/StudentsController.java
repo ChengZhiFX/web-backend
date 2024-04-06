@@ -73,4 +73,17 @@ public class StudentsController {
     public int importStudents(@RequestParam("file") MultipartFile file) throws Exception {
         return studentsService.importStudents(file.getInputStream(), file.getOriginalFilename());
     }
+
+    @PostMapping("exportStudentsTemplate")
+    @Privilege("page")
+    public void exportStudentsTemplate(HttpServletResponse response) throws Exception {
+        Workbook workbook = studentsService.exportTemplate();
+        response.setContentType("application/vnd.ms-excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
+        response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");
+        OutputStream os = response.getOutputStream();
+        workbook.write(os);
+        os.close();
+        workbook.close();
+    }
 }

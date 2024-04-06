@@ -174,6 +174,12 @@
     <if test="queryDTO.classId > 0">
       and class_id = #{queryDTO.classId}
     </if>
+    <if test="queryDTO.orderBy != null">
+      order by ${queryDTO.orderBy}
+    </if>
+    <if test="queryDTO.orderBy == null">
+      order by id asc
+    </if>
     limit #{offset}, #{limit}
   </select>
 

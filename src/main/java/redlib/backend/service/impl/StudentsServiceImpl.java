@@ -33,29 +33,24 @@ public class StudentsServiceImpl implements StudentsService {
 
     @Override
     public Page<StudentsVO> listByPage(StudentsQueryDTO queryDTO) {
-        if (queryDTO == null) {
-            queryDTO = new StudentsQueryDTO();
-        }
+        Assert.notNull(queryDTO, "查询参数不能为空");
+        FormatUtils.trimFieldToNull(queryDTO);
+        queryDTO.setOrderBy(FormatUtils.formatOrderBy(queryDTO.getOrderBy()));
         queryDTO.setStudentName(FormatUtils.makeFuzzySearchTerm(queryDTO.getStudentName()));
 
         Integer size = studentsMapper.count(queryDTO);
         PageUtils pageUtils = new PageUtils(queryDTO.getCurrent(), queryDTO.getPageSize(), size);
-
-        if (size == 0) {
-            // 没有命中，则返回空数据。
+        if (pageUtils.isDataEmpty()) {
             return pageUtils.getNullPage();
         }
-
         // 利用myBatis到数据库中查询数据，以分页的方式
         List<Students> list = studentsMapper.list(queryDTO, pageUtils.getOffset(), pageUtils.getLimit());
-
         List<StudentsVO> voList = new ArrayList<>();
         for (Students students : list) {
             // Students对象转VO对象
             StudentsVO vo = StudentsUtils.convertToVO(students);
             voList.add(vo);
         }
-
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);
     }
     @Override
@@ -140,5 +135,18 @@ public class StudentsServiceImpl implements StudentsService {
             row.incrementAndGet();
         }, map, StudentsDTO.class);
         return row.get();
+    }
+
+    @Override
+    public Workbook exportTemplate() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", "ID");
+        map.put("studentName", "姓名");
+        map.put("studentNum", "学号");
+        map.put("gender", "性别");
+        map.put("parentName", "家长姓名");
+        map.put("parentTel", "家长电话");
+        map.put("classId", "班级号");
+        return XlsUtils.exportToExcel(page -> new ArrayList<StudentsDTO>(), map);
     }
 }

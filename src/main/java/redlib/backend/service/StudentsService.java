@@ -18,4 +18,5 @@ public interface StudentsService {
     void deleteById(Integer id);
     Workbook export(StudentsQueryDTO queryDTO);
     int importStudents(InputStream inputStream, String fileName) throws Exception;
+    Workbook exportTemplate();
 }

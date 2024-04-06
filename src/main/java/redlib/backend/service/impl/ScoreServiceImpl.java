@@ -6,22 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import redlib.backend.dao.ScoreMapper;
-import redlib.backend.dto.AverageDTO;
+import redlib.backend.dto.query.AverageQueryDTO;
+import redlib.backend.utils.FormatUtils;
 import redlib.backend.vo.AverageVO;
 import redlib.backend.dto.ScoreDTO;
 import redlib.backend.dto.query.ScoreQueryDTO;
 import redlib.backend.model.Page;
 import redlib.backend.model.Score;
-import redlib.backend.model.Token;
 import redlib.backend.service.ScoreService;
 import redlib.backend.service.utils.ScoreUtils;
 import redlib.backend.utils.PageUtils;
-import redlib.backend.utils.ThreadContextHolder;
 import redlib.backend.utils.XlsUtils;
 import redlib.backend.vo.ScoreVO;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,29 +34,23 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public Page<ScoreVO> listByPage(ScoreQueryDTO queryDTO) {
-        if (queryDTO == null) {
-            queryDTO = new ScoreQueryDTO();
-        }
+        Assert.notNull(queryDTO, "查询参数不能为空");
+        FormatUtils.trimFieldToNull(queryDTO);
+        queryDTO.setOrderBy(FormatUtils.formatOrderBy(queryDTO.getOrderBy()));
 
         Integer size = scoreMapper.count(queryDTO);
         PageUtils pageUtils = new PageUtils(queryDTO.getCurrent(), queryDTO.getPageSize(), size);
-
-        if (size == 0) {
-            // 没有命中，则返回空数据。
+        if (pageUtils.isDataEmpty()) {
             return pageUtils.getNullPage();
         }
-
         // 利用myBatis到数据库中查询数据，以分页的方式
         List<Score> list = scoreMapper.list(queryDTO, pageUtils.getOffset(), pageUtils.getLimit());
-
-
         List<ScoreVO> voList = new ArrayList<>();
         for (Score score : list) {
             // Score对象转VO对象
             ScoreVO vo = ScoreUtils.convertToVO(score);
             voList.add(vo);
         }
-
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);
     }
 
@@ -131,7 +125,6 @@ public class ScoreServiceImpl implements ScoreService {
     public int importScores(InputStream inputStream, String fileName) throws Exception {
         Assert.hasText(fileName, "文件名不能为空");
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("流水号", "id");
         map.put("学号", "studentNum");
         map.put("语文成绩", "chineseScore");
         map.put("数学成绩", "mathScore");
@@ -148,36 +141,44 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public List<AverageVO> getAverageOfClass(AverageDTO averageDTO) {
-        List<Map> list = scoreMapper.getAverageOfClass(averageDTO);
+    public Page<AverageVO> getAverageOfClass(AverageQueryDTO averageQueryDTO) {
+        List<Map> list = scoreMapper.getAverageOfClass(averageQueryDTO);
+        if (averageQueryDTO == null) {
+            averageQueryDTO = new AverageQueryDTO();
+        }
+        int size = list.size();
+        PageUtils pageUtils = new PageUtils(averageQueryDTO.getCurrent(), averageQueryDTO.getPageSize(), size);
+        if (size == 0) {
+            // 没有命中，则返回空数据。
+            return pageUtils.getNullPage();
+        }
         List<AverageVO> voList = new ArrayList<>();
         for (Map map : list) {
             AverageVO vo = new AverageVO();
             vo.setClassId((Integer) map.get("class_id"));
-            vo.setAverageChineseScore(((BigDecimal) map.get("avg(chinese_score)")).floatValue());
-            vo.setAverageMathScore(((BigDecimal) map.get("avg(math_score)")).floatValue());
-            vo.setAverageEnglishScore(((BigDecimal) map.get("avg(english_score)")).floatValue());
+            Float averageChineseScore = ((BigDecimal) map.get("avg(chinese_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
+            Float averageMathScore = ((BigDecimal) map.get("avg(math_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
+            Float averageEnglishScore = ((BigDecimal) map.get("avg(english_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
+            Float averageTotalScore = averageChineseScore + averageMathScore + averageEnglishScore;
+            vo.setAverageChineseScore(averageChineseScore);
+            vo.setAverageMathScore(averageMathScore);
+            vo.setAverageEnglishScore(averageEnglishScore);
+            vo.setAverageTotalScore(averageTotalScore);
             voList.add(vo);
         }
-        return voList;
-    }
-/*
-    @Override
-    public List<Score> getScoresByClass(Integer classId) {
-        return null;
+        return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);
     }
 
     @Override
-    public Map<String, Double> calculateAverageScoreByClass(Short academicYear, Byte semester) {
-        List<Score> scores = getScoresByAcademicYearAndSemester(academicYear, semester);
-        Map<String, List<Score>> scoresByClass = scores.stream().collect(Collectors.groupingBy(Score::getClassName));
-        Map<String, Double> averageScores = new HashMap<>();
-        scoresByClass.forEach((className, classScores) -> {
-            double avgScore = classScores.stream().mapToDouble(Score::getTotalScore).average().orElse(0.0);
-            averageScores.put(className, avgScore);
-        });
-        return averageScores;
+    public Workbook exportTemplate() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("studentNum", "学号");
+        map.put("chineseScore", "语文成绩");
+        map.put("mathScore", "数学成绩");
+        map.put("englishScore", "英语成绩");
+        map.put("academicYear", "学年");
+        map.put("semester", "学期");
+        map.put("classId", "班级号");
+        return XlsUtils.exportToExcel(page -> new ArrayList<ScoreDTO>(), map);
     }
-
- */
 }

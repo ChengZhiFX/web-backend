@@ -94,6 +94,12 @@
   <select id="count" resultType="integer">
     select count(*) from classes
     where 1
+    <if test="id != null">
+      and id = #{id}
+    </if>
+    <if test="className != null">
+      and class_name like #{className}
+    </if>
     <if test="chineseTeacher != null">
       and chinese_teacher like #{chineseTeacher}
     </if>
@@ -110,6 +116,12 @@
     <include refid="Base_Column_List" />
     from classes
     where 1
+    <if test="queryDTO.id != null">
+      and id = #{queryDTO.id}
+    </if>
+    <if test="queryDTO.className != null">
+      and class_name like #{queryDTO.className}
+    </if>
     <if test="queryDTO.chineseTeacher != null">
       and chinese_teacher like #{queryDTO.chineseTeacher}
     </if>
@@ -118,6 +130,12 @@
     </if>
     <if test="queryDTO.englishTeacher != null">
       and english_teacher like #{queryDTO.englishTeacher}
+    </if>
+    <if test="queryDTO.orderBy != null">
+      order by ${queryDTO.orderBy}
+    </if>
+    <if test="queryDTO.orderBy == null">
+      order by id asc
     </if>
     limit #{offset}, #{limit}
   </select>

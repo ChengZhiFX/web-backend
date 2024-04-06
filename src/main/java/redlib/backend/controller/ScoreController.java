@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
 import redlib.backend.annotation.Privilege;
-import redlib.backend.dto.AverageDTO;
+import redlib.backend.dto.query.AverageQueryDTO;
 import redlib.backend.vo.AverageVO;
 import redlib.backend.dto.ScoreDTO;
 import redlib.backend.dto.query.ScoreQueryDTO;
@@ -84,7 +84,20 @@ public class ScoreController {
 
     @PostMapping("getAverageOfClass")
     @Privilege("page")
-    public List<AverageVO> getAverageOfClass(@RequestBody AverageDTO averageDTO) {
-        return scoreService.getAverageOfClass(averageDTO);
+    public Page<AverageVO> getAverageOfClass(@RequestBody AverageQueryDTO averageQueryDTO) {
+        return scoreService.getAverageOfClass(averageQueryDTO);
+    }
+
+    @PostMapping("exportScoreTemplate")
+    @Privilege("page")
+    public void exportScoreTemplate(HttpServletResponse response) throws Exception {
+        Workbook workbook = scoreService.exportTemplate();
+        response.setContentType("application/vnd.ms-excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
+        response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");
+        OutputStream os = response.getOutputStream();
+        workbook.write(os);
+        os.close();
+        workbook.close();
     }
 }

@@ -1,7 +1,7 @@
 package redlib.backend.dao;
 
 import org.apache.ibatis.annotations.Param;
-import redlib.backend.dto.AverageDTO;
+import redlib.backend.dto.query.AverageQueryDTO;
 import redlib.backend.dto.query.ScoreQueryDTO;
 import redlib.backend.model.Score;
 
@@ -18,5 +18,5 @@ public interface ScoreMapper {
     Integer count(ScoreQueryDTO queryDTO);
     List<Score> list(@Param("queryDTO") ScoreQueryDTO queryDTO, @Param("offset") Integer offset, @Param("limit") Integer limit);
     void deleteByCodes(@Param("codeList") List<Integer> codeList);
-    List<Map> getAverageOfClass(AverageDTO averageDTO);
+    List<Map> getAverageOfClass(AverageQueryDTO averageQueryDTO);
 }

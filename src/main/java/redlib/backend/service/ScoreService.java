@@ -1,7 +1,7 @@
 package redlib.backend.service;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import redlib.backend.dto.AverageDTO;
+import redlib.backend.dto.query.AverageQueryDTO;
 import redlib.backend.vo.AverageVO;
 import redlib.backend.dto.ScoreDTO;
 import redlib.backend.dto.query.ScoreQueryDTO;
@@ -20,11 +20,6 @@ public interface ScoreService {
     void deleteById(Integer id);
     Workbook export(ScoreQueryDTO queryDTO);
     int importScores(InputStream inputStream, String fileName) throws Exception;
-    List<AverageVO> getAverageOfClass(AverageDTO averageDTO);
-    /*
-    Integer getClassIdByStudentNum(String studentNum);
-    List<Score> getByAcademicYearAndSemester(Short academicYear, Byte semester);
-    List<Score> getByClass(Integer classId);
-    Map<String, Double> calculateAverageScoreByClass(Short academicYear, Byte semester);
-     */
+    Page<AverageVO> getAverageOfClass(AverageQueryDTO averageQueryDTO);
+    Workbook exportTemplate();
 }
