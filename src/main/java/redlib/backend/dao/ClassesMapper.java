@@ -5,6 +5,7 @@ import redlib.backend.dto.query.ClassesQueryDTO;
 import redlib.backend.model.Classes;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClassesMapper {
     int deleteByPrimaryKey(Integer id);
@@ -16,4 +17,5 @@ public interface ClassesMapper {
     Integer count(ClassesQueryDTO queryDTO);
     List<Classes> list(@Param("queryDTO") ClassesQueryDTO queryDTO, @Param("offset") Integer offset, @Param("limit") Integer limit);
     void deleteByCodes(@Param("codeList") List<Integer> codeList);
+    List<Map<Object, Object>> listIdToNameMaps();
 }

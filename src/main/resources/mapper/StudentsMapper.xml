@@ -166,4 +166,17 @@
       #{item}
     </foreach>
   </update>
+
+  <select id="selectByStudentNum" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from students
+    where student_num = #{studentNum,jdbcType=INTEGER}
+  </select>
+
+  <select id="listNumToNameMaps" resultType="java.util.Map">
+    select student_num,student_name
+    from students
+    order by student_num asc
+  </select>
 </mapper>

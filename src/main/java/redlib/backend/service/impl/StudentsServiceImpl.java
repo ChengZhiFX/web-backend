@@ -122,10 +122,9 @@ public class StudentsServiceImpl implements StudentsService {
     public int importStudents(InputStream inputStream, String fileName) throws Exception {
         Assert.hasText(fileName, "文件名不能为空");
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("ID", "id");
         map.put("姓名", "studentName");
         map.put("学号", "studentNum");
-        map.put("性别", "gender");
+        map.put("性别(男1女0)", "gender");
         map.put("家长姓名", "parentName");
         map.put("家长电话", "parentTel");
         map.put("班级号", "classId");
@@ -140,10 +139,9 @@ public class StudentsServiceImpl implements StudentsService {
     @Override
     public Workbook exportTemplate() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("id", "ID");
         map.put("studentName", "姓名");
         map.put("studentNum", "学号");
-        map.put("gender", "性别");
+        map.put("gender", "性别(男1女0)");
         map.put("parentName", "家长姓名");
         map.put("parentTel", "家长电话");
         map.put("classId", "班级号");
@@ -155,5 +153,13 @@ public class StudentsServiceImpl implements StudentsService {
         StudentsQueryDTO queryDTO = new StudentsQueryDTO();
         queryDTO.setClassId(classId);
         return studentsMapper.count(queryDTO);
+    }
+
+    @Override
+    public StudentsDTO getByStudentNum(Integer studentNum) {
+        Students students = studentsMapper.selectByStudentNum(studentNum);
+        StudentsDTO dto = new StudentsDTO();
+        if(students != null) BeanUtils.copyProperties(students, dto);
+        return dto;
     }
 }

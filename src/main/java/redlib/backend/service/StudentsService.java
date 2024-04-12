@@ -20,4 +20,5 @@ public interface StudentsService {
     int importStudents(InputStream inputStream, String fileName) throws Exception;
     Workbook exportTemplate();
     int getTotalOfStudents(Integer classId);
+    StudentsDTO getByStudentNum(Integer studentNum);
 }

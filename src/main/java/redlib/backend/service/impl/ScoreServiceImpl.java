@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import redlib.backend.dao.ScoreMapper;
 import redlib.backend.dto.query.AverageQueryDTO;
+import redlib.backend.service.ClassesService;
+import redlib.backend.service.StudentsService;
 import redlib.backend.utils.FormatUtils;
 import redlib.backend.vo.AverageVO;
 import redlib.backend.dto.ScoreDTO;
@@ -31,6 +33,10 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Autowired
     private ScoreMapper scoreMapper;
+    @Autowired
+    private StudentsService studentsService;
+    @Autowired
+    private ClassesService classesService;
 
     @Override
     public Page<ScoreVO> listByPage(ScoreQueryDTO queryDTO) {
@@ -49,6 +55,7 @@ public class ScoreServiceImpl implements ScoreService {
         for (Score score : list) {
             // Score对象转VO对象
             ScoreVO vo = ScoreUtils.convertToVO(score);
+            vo.setStudentName(studentsService.getByStudentNum(vo.getStudentNum()).getStudentName());
             voList.add(vo);
         }
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);
@@ -56,9 +63,18 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public Integer addScore(ScoreDTO scoreDTO) {
+        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getId(), "对应学号学生不存在");
+        ScoreQueryDTO queryDTO = new ScoreQueryDTO();
+        queryDTO.setCurrent(1);
+        queryDTO.setPageSize(10);
+        queryDTO.setStudentNum(scoreDTO.getStudentNum());
+        queryDTO.setAcademicYear(scoreDTO.getAcademicYear());
+        queryDTO.setSemester(scoreDTO.getSemester());
+        Assert.isTrue(scoreMapper.count(queryDTO) < 1, "此学生该学期成绩已存在");
         Score score = new Score();
         // 将输入的字段全部复制到实体对象中
         BeanUtils.copyProperties(scoreDTO, score);
+        score.setClassId(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getClassId());
         score.setEntryEvent(new Date());
         // 调用DAO方法保存到数据库表
         scoreMapper.insert(score);
@@ -75,10 +91,12 @@ public class ScoreServiceImpl implements ScoreService {
     }
     @Override
     public Integer updateScore(ScoreDTO scoreDTO) {
+        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getId(), "对应学号学生不存在");
         Assert.notNull(scoreDTO.getId(), "id不能为空");
         Score score = scoreMapper.selectByPrimaryKey(scoreDTO.getId());
         Assert.notNull(score, "没有找到，Id为：" + scoreDTO.getId());
         BeanUtils.copyProperties(scoreDTO, score);
+        score.setClassId(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getClassId());
         scoreMapper.updateByPrimaryKey(score);
         return score.getId();
     }
@@ -164,6 +182,7 @@ public class ScoreServiceImpl implements ScoreService {
             vo.setAverageMathScore(averageMathScore);
             vo.setAverageEnglishScore(averageEnglishScore);
             vo.setAverageTotalScore(averageTotalScore);
+            vo.setClassName(classesService.getById(vo.getClassId()).getClassName());
             voList.add(vo);
         }
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);

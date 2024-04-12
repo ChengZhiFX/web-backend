@@ -147,4 +147,10 @@
       #{item}
     </foreach>
   </update>
+
+  <select id="listIdToNameMaps" resultType="java.util.Map">
+    select id,class_name
+    from classes
+    order by id desc
+  </select>
 </mapper>

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
 import redlib.backend.annotation.Privilege;
+import redlib.backend.dao.StudentsMapper;
 import redlib.backend.dto.StudentsDTO;
 import redlib.backend.dto.query.StudentsQueryDTO;
 import redlib.backend.model.Page;
@@ -17,6 +18,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/students")
@@ -24,6 +26,9 @@ import java.util.List;
 public class StudentsController {
     @Autowired
     private StudentsService studentsService;
+    @Autowired
+    private StudentsMapper studentsMapper;
+
     @PostMapping("listStudents")
     @Privilege("page")
     public Page<StudentsVO> listStudents(@RequestBody StudentsQueryDTO queryDTO) {
@@ -85,5 +90,11 @@ public class StudentsController {
         workbook.write(os);
         os.close();
         workbook.close();
+    }
+
+    @PostMapping("ListStudentsMaps")
+    @Privilege("page")
+    public List<Map<Object, Object>> ListStudentsMaps() {
+        return studentsMapper.listNumToNameMaps();
     }
 }
