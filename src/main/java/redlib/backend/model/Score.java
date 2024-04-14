@@ -6,8 +6,8 @@ import lombok.Data;
 /**
  * 描述:score表的实体类
  * @version
- * @author:  Colorange
- * @创建时间: 2024-04-06
+ * &#064;author:   Colorange
+ * &#064;创建时间:  2024-04-06
  */
 @Data
 public class Score {
@@ -38,6 +38,11 @@ public class Score {
 
     /**
      * 
+     */
+    private Integer totalScore;
+
+    /**
+     *
      */
     private Date entryEvent;
 

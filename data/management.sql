@@ -13,7 +13,7 @@ create table students(
 ) engine=InnoDB;
 
 create table classes(
-    id int not null primary key auto_increment,
+    id int not null primary key,
     class_name varchar(20) not null,
     chinese_teacher varchar(20),
     math_teacher varchar(20),
@@ -26,6 +26,7 @@ create table score(
     chinese_score tinyint default 0,
     math_score tinyint default 0,
     english_score tinyint default 0,
+    total_score smallint default 0,
     entry_event datetime DEFAULT CURRENT_TIMESTAMP,
     academic_year smallint,
     semester tinyint,

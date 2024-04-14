@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class StudentsServiceImpl implements StudentsService {
-
     @Autowired
     private StudentsMapper studentsMapper;
 
@@ -55,11 +54,10 @@ public class StudentsServiceImpl implements StudentsService {
     }
     @Override
     public Integer addStudent(StudentsDTO studentsDTO) {
-        // 创建实体对象，用以保存到数据库
+        StudentsUtils.validateStudents(studentsDTO);
+        Assert.isNull(studentsMapper.selectByStudentNum(studentsDTO.getStudentNum()),"指定学号的学生已存在");
         Students students = new Students();
-        // 将输入的字段全部复制到实体对象中
         BeanUtils.copyProperties(studentsDTO, students);
-        // 调用DAO方法保存到数据库表
         studentsMapper.insert(students);
         return students.getId();
     }
@@ -74,16 +72,16 @@ public class StudentsServiceImpl implements StudentsService {
     }
     @Override
     public Integer updateStudent(StudentsDTO studentsDTO) {
+        StudentsUtils.validateStudents(studentsDTO);
         Assert.notNull(studentsDTO.getId(), "id不能为空");
         Students students = studentsMapper.selectByPrimaryKey(studentsDTO.getId());
-        Assert.notNull(students, "没有找到，Id为：" + studentsDTO.getId());
+        Assert.notNull(students, "没有找到Id为：" + studentsDTO.getId());
         BeanUtils.copyProperties(studentsDTO, students);
         studentsMapper.updateByPrimaryKey(students);
         return students.getId();
     }
     @Override
     public void deleteById(Integer id) {
-        Assert.notNull(id, "请提供id");
         Assert.notNull(id, "id不能为空");
         studentsMapper.deleteByPrimaryKey(id);
     }

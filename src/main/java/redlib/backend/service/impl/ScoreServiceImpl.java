@@ -63,7 +63,8 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public Integer addScore(ScoreDTO scoreDTO) {
-        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getId(), "对应学号学生不存在");
+        ScoreUtils.validateScore(scoreDTO);
+        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()), "对应学号学生不存在");
         ScoreQueryDTO queryDTO = new ScoreQueryDTO();
         queryDTO.setCurrent(1);
         queryDTO.setPageSize(10);
@@ -74,6 +75,7 @@ public class ScoreServiceImpl implements ScoreService {
         Score score = new Score();
         // 将输入的字段全部复制到实体对象中
         BeanUtils.copyProperties(scoreDTO, score);
+        score.setTotalScore(score.getChineseScore()+score.getMathScore()+score.getEnglishScore());
         score.setClassId(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getClassId());
         score.setEntryEvent(new Date());
         // 调用DAO方法保存到数据库表
@@ -91,18 +93,19 @@ public class ScoreServiceImpl implements ScoreService {
     }
     @Override
     public Integer updateScore(ScoreDTO scoreDTO) {
-        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getId(), "对应学号学生不存在");
+        ScoreUtils.validateScore(scoreDTO);
+        Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()), "对应学号学生不存在");
         Assert.notNull(scoreDTO.getId(), "id不能为空");
         Score score = scoreMapper.selectByPrimaryKey(scoreDTO.getId());
         Assert.notNull(score, "没有找到，Id为：" + scoreDTO.getId());
         BeanUtils.copyProperties(scoreDTO, score);
+        score.setTotalScore(score.getChineseScore()+score.getMathScore()+score.getEnglishScore());
         score.setClassId(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getClassId());
         scoreMapper.updateByPrimaryKey(score);
         return score.getId();
     }
     @Override
     public void deleteById(Integer id) {
-        Assert.notNull(id, "请提供id");
         Assert.notNull(id, "id不能为空");
         scoreMapper.deleteByPrimaryKey(id);
     }
@@ -121,6 +124,7 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("chineseScore", "语文成绩");
         map.put("mathScore", "数学成绩");
         map.put("englishScore", "英语成绩");
+        map.put("totalScore", "总成绩");
         map.put("entryEvent", "录入时间");
         map.put("academicYear", "学年");
         map.put("semester", "学期");
@@ -149,7 +153,6 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("英语成绩", "englishScore");
         map.put("学年", "academicYear");
         map.put("学期", "semester");
-        map.put("班级号", "classId");
         AtomicInteger row = new AtomicInteger(0);
         XlsUtils.importFromExcel(inputStream, fileName, (scoreDTO) -> {
             addScore(scoreDTO);
@@ -177,7 +180,7 @@ public class ScoreServiceImpl implements ScoreService {
             Float averageChineseScore = ((BigDecimal) map.get("avg(chinese_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
             Float averageMathScore = ((BigDecimal) map.get("avg(math_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
             Float averageEnglishScore = ((BigDecimal) map.get("avg(english_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
-            Float averageTotalScore = averageChineseScore + averageMathScore + averageEnglishScore;
+            Float averageTotalScore = ((BigDecimal) map.get("avg(total_score)")).setScale(1, RoundingMode.HALF_UP).floatValue();
             vo.setAverageChineseScore(averageChineseScore);
             vo.setAverageMathScore(averageMathScore);
             vo.setAverageEnglishScore(averageEnglishScore);
@@ -197,7 +200,6 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("englishScore", "英语成绩");
         map.put("academicYear", "学年");
         map.put("semester", "学期");
-        map.put("classId", "班级号");
         return XlsUtils.exportToExcel(page -> new ArrayList<ScoreDTO>(), map);
     }
 }

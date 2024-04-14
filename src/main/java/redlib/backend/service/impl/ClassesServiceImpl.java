@@ -58,18 +58,15 @@ public class ClassesServiceImpl implements ClassesService {
     @Override
     public Integer addClass(ClassesDTO classesDTO) {
         ClassesUtils.validateClasses(classesDTO);
-        // 创建实体对象，用以保存到数据库
+        Assert.isNull(classesMapper.selectByPrimaryKey(classesDTO.getId()),"指定的班级已存在");
         Classes classes = new Classes();
-        // 将输入的字段全部复制到实体对象中
         BeanUtils.copyProperties(classesDTO, classes);
-        // 调用DAO方法保存到数据库表
         classesMapper.insert(classes);
         return classes.getId();
     }
 
     @Override
     public ClassesDTO getById(Integer id) {
-        Assert.notNull(id, "请提供id");
         Assert.notNull(id, "id不能为空");
         Classes classes = classesMapper.selectByPrimaryKey(id);
         Assert.notNull(classes, "id不存在");
@@ -81,22 +78,21 @@ public class ClassesServiceImpl implements ClassesService {
     @Override
     public Integer updateClass(ClassesDTO classesDTO) {
         ClassesUtils.validateClasses(classesDTO);
-        Assert.notNull(classesDTO.getId(), "部门id不能为空");
+        Assert.notNull(classesDTO.getId(), "id不能为空");
         Classes classes = classesMapper.selectByPrimaryKey(classesDTO.getId());
-        Assert.notNull(classes, "没有找到部门，Id为：" + classesDTO.getId());
+        Assert.notNull(classes, "没有找到Id为：" + classesDTO.getId());
         BeanUtils.copyProperties(classesDTO, classes);
         classesMapper.updateByPrimaryKey(classes);
         return classes.getId();
     }
     @Override
     public void deleteById(Integer id) {
-        Assert.notNull(id, "请提供id");
         Assert.notNull(id, "id不能为空");
         classesMapper.deleteByPrimaryKey(id);
     }
     @Override
     public void deleteByCodes(List<Integer> ids) {
-        Assert.notEmpty(ids, "部门id列表不能为空");
+        Assert.notEmpty(ids, "id列表不能为空");
         classesMapper.deleteByCodes(ids);
     }
 

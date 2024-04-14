@@ -7,14 +7,15 @@
     <result column="chinese_score" jdbcType="TINYINT" property="chineseScore" />
     <result column="math_score" jdbcType="TINYINT" property="mathScore" />
     <result column="english_score" jdbcType="TINYINT" property="englishScore" />
+    <result column="total_score" jdbcType="SMALLINT" property="totalScore" />
     <result column="entry_event" jdbcType="TIMESTAMP" property="entryEvent" />
     <result column="academic_year" jdbcType="SMALLINT" property="academicYear" />
     <result column="semester" jdbcType="TINYINT" property="semester" />
     <result column="class_id" jdbcType="INTEGER" property="classId" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, student_num, chinese_score, math_score, english_score, entry_event, academic_year, 
-    semester, class_id
+    id, student_num, chinese_score, math_score, english_score, total_score, entry_event, 
+    academic_year, semester, class_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -28,13 +29,13 @@
   </delete>
   <insert id="insert" parameterType="redlib.backend.model.Score">
     insert into score (id, student_num, chinese_score, 
-      math_score, english_score, entry_event, 
-      academic_year, semester, class_id
-      )
+      math_score, english_score, total_score, 
+      entry_event, academic_year, semester, 
+      class_id)
     values (#{id,jdbcType=INTEGER}, #{studentNum,jdbcType=INTEGER}, #{chineseScore,jdbcType=TINYINT}, 
-      #{mathScore,jdbcType=TINYINT}, #{englishScore,jdbcType=TINYINT}, #{entryEvent,jdbcType=TIMESTAMP}, 
-      #{academicYear,jdbcType=SMALLINT}, #{semester,jdbcType=TINYINT}, #{classId,jdbcType=INTEGER}
-      )
+      #{mathScore,jdbcType=TINYINT}, #{englishScore,jdbcType=TINYINT}, #{totalScore,jdbcType=SMALLINT}, 
+      #{entryEvent,jdbcType=TIMESTAMP}, #{academicYear,jdbcType=SMALLINT}, #{semester,jdbcType=TINYINT}, 
+      #{classId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="redlib.backend.model.Score">
     insert into score
@@ -53,6 +54,9 @@
       </if>
       <if test="englishScore != null">
         english_score,
+      </if>
+      <if test="totalScore != null">
+        total_score,
       </if>
       <if test="entryEvent != null">
         entry_event,
@@ -83,6 +87,9 @@
       <if test="englishScore != null">
         #{englishScore,jdbcType=TINYINT},
       </if>
+      <if test="totalScore != null">
+        #{totalScore,jdbcType=SMALLINT},
+      </if>
       <if test="entryEvent != null">
         #{entryEvent,jdbcType=TIMESTAMP},
       </if>
@@ -112,6 +119,9 @@
       <if test="englishScore != null">
         english_score = #{englishScore,jdbcType=TINYINT},
       </if>
+      <if test="totalScore != null">
+        total_score = #{totalScore,jdbcType=SMALLINT},
+      </if>
       <if test="entryEvent != null">
         entry_event = #{entryEvent,jdbcType=TIMESTAMP},
       </if>
@@ -133,6 +143,7 @@
       chinese_score = #{chineseScore,jdbcType=TINYINT},
       math_score = #{mathScore,jdbcType=TINYINT},
       english_score = #{englishScore,jdbcType=TINYINT},
+      total_score = #{totalScore,jdbcType=SMALLINT},
       entry_event = #{entryEvent,jdbcType=TIMESTAMP},
       academic_year = #{academicYear,jdbcType=SMALLINT},
       semester = #{semester,jdbcType=TINYINT},
@@ -193,7 +204,7 @@
   </update>
 
   <select id="getAverageOfClass" resultType="java.util.Map">
-    select class_id,avg(chinese_score),avg(math_score),avg(english_score)
+    select class_id,avg(chinese_score),avg(math_score),avg(english_score),avg(total_score)
     from score
     where 1
     <if test="academicYear > 0">
@@ -206,7 +217,7 @@
   </select>
 
   <select id="getAverageSelective" resultType="java.util.Map">
-    select avg(chinese_score),avg(math_score),avg(english_score)
+    select avg(chinese_score),avg(math_score),avg(english_score),avg(total_score)
     from score
     where 1
     <if test="studentNum > 0">

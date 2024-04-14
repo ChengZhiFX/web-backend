@@ -7,8 +7,6 @@ import redlib.backend.model.Students;
 import redlib.backend.utils.FormatUtils;
 import redlib.backend.vo.StudentsVO;
 
-import java.util.Map;
-
 public class StudentsUtils {
     /**
      * 规范并校验studentsDTO
@@ -17,8 +15,8 @@ public class StudentsUtils {
      */
     public static void validateStudents(StudentsDTO studentsDTO) {
         FormatUtils.trimFieldToNull(studentsDTO);
-        Assert.notNull(studentsDTO, "部门输入数据不能为空");
-        Assert.hasText(studentsDTO.getStudentName(), "部门名称不能为空");
+        Assert.notNull(studentsDTO, "输入数据不能为空");
+        Assert.hasText(studentsDTO.getStudentName(), "姓名不能为空");
     }
 
     /**
