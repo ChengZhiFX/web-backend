@@ -3,6 +3,7 @@ package redlib.backend.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
@@ -73,6 +74,7 @@ public class StudentsController {
         workbook.close();
     }
 
+    @Transactional
     @PostMapping("importStudents")
     @Privilege("add")
     public int importStudents(@RequestParam("file") MultipartFile file) throws Exception {
@@ -96,5 +98,11 @@ public class StudentsController {
     @Privilege("page")
     public List<Map<Object, Object>> ListStudentsMaps() {
         return studentsMapper.listNumToNameMaps();
+    }
+
+    @PostMapping("getTotalStudents")
+    @Privilege("page")
+    public int getTotalStudents() {
+        return studentsService.getTotalStudents();
     }
 }

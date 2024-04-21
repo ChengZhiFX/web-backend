@@ -141,12 +141,15 @@ public class FormatUtils {
         }
 
         String field = camel2under(pairs[0]);
-        String order = "asc";
+        String order = pairs[1];
+        if ("ascend".equals(pairs[1])) {
+            order = "asc";
+        }
         if ("descend".equals(pairs[1])) {
             order = "desc";
         }
 
-        return '`' + field + "` " + order;
+        return field + ' ' + order;
     }
 
     public static boolean isAsc(String orderBy) {

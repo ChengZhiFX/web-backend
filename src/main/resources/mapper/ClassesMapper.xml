@@ -131,8 +131,14 @@
     <if test="queryDTO.englishTeacher != null">
       and english_teacher like #{queryDTO.englishTeacher}
     </if>
-    <if test="queryDTO.orderBy != null">
+    <if test="queryDTO.orderBy != null and queryDTO.orderBy != 'class_name asc' and queryDTO.orderBy != 'class_name desc'">
       order by ${queryDTO.orderBy}
+    </if>
+    <if test="queryDTO.orderBy == 'class_name asc' ">
+      order by field(substring(class_name,1,1), '一', '二', '三', '四', '五', '六') asc, id asc
+    </if>
+    <if test="queryDTO.orderBy == 'class_name desc' ">
+      order by field(substring(class_name,1,1), '一', '二', '三', '四', '五', '六') desc, id desc
     </if>
     <if test="queryDTO.orderBy == null">
       order by id asc
@@ -151,6 +157,6 @@
   <select id="listIdToNameMaps" resultType="java.util.Map">
     select id,class_name
     from classes
-    order by id desc
+    order by field(substring(class_name,1,1), '一', '二', '三', '四', '五', '六') asc, id asc
   </select>
 </mapper>

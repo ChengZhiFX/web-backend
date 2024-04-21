@@ -39,7 +39,7 @@ public class ClassesServiceImpl implements ClassesService {
         Assert.notNull(queryDTO, "查询参数不能为空");
         FormatUtils.trimFieldToNull(queryDTO);
         queryDTO.setOrderBy(FormatUtils.formatOrderBy(queryDTO.getOrderBy()));
-
+        queryDTO.setClassName(FormatUtils.makeFuzzySearchTerm(queryDTO.getClassName()));
         Integer size = classesMapper.count(queryDTO);
         PageUtils pageUtils = new PageUtils(queryDTO.getCurrent(), queryDTO.getPageSize(), size);
         if (pageUtils.isDataEmpty()) {
@@ -50,7 +50,7 @@ public class ClassesServiceImpl implements ClassesService {
         List<ClassesVO> voList = new ArrayList<>();
         for (Classes classes : list) {
             ClassesVO vo = ClassesUtils.convertToVO(classes);
-            vo.setTotalStudents(studentsService.getTotalOfStudents(vo.getId()));
+            vo.setTotalStudents(studentsService.getTotalStudentsOfClass(vo.getId()));
             voList.add(vo);
         }
         return new Page<>(pageUtils.getCurrent(), pageUtils.getPageSize(), pageUtils.getTotal(), voList);
@@ -80,7 +80,7 @@ public class ClassesServiceImpl implements ClassesService {
         ClassesUtils.validateClasses(classesDTO);
         Assert.notNull(classesDTO.getId(), "id不能为空");
         Classes classes = classesMapper.selectByPrimaryKey(classesDTO.getId());
-        Assert.notNull(classes, "没有找到Id为：" + classesDTO.getId());
+        Assert.notNull(classes, "没有找到班级号为 " + classesDTO.getId() + " 的班级");
         BeanUtils.copyProperties(classesDTO, classes);
         classesMapper.updateByPrimaryKey(classes);
         return classes.getId();
@@ -124,7 +124,6 @@ public class ClassesServiceImpl implements ClassesService {
         Assert.hasText(fileName, "文件名不能为空");
         Map<String, String> map = new LinkedHashMap<>();
         map.put("班级号", "id");
-        map.put("班级名称", "className");
         map.put("语文教师", "chineseTeacher");
         map.put("数学教师", "mathTeacher");
         map.put("英语教师", "englishTeacher");
@@ -140,10 +139,15 @@ public class ClassesServiceImpl implements ClassesService {
     public Workbook exportTemplate() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", "班级号");
-        map.put("className", "班级名称");
         map.put("chineseTeacher", "语文教师");
         map.put("mathTeacher", "数学教师");
         map.put("englishTeacher", "英语教师");
         return XlsUtils.exportToExcel(page -> new ArrayList<ClassesDTO>(), map);
+    }
+
+    @Override
+    public int getTotalClasses() {
+        ClassesQueryDTO queryDTO = new ClassesQueryDTO();
+        return classesMapper.count(queryDTO);
     }
 }

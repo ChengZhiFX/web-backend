@@ -149,8 +149,14 @@
     <if test="queryDTO.classId > 0">
       and class_id = #{queryDTO.classId}
     </if>
-    <if test="queryDTO.orderBy != null">
+    <if test="queryDTO.orderBy != null and queryDTO.orderBy != 'student_name asc' and queryDTO.orderBy != 'student_name desc'">
       order by ${queryDTO.orderBy}
+    </if>
+    <if test="queryDTO.orderBy == 'student_name asc' ">
+      order by convert(student_name using gbk) collate gbk_chinese_ci asc
+    </if>
+    <if test="queryDTO.orderBy == 'student_name desc' ">
+      order by convert(student_name using gbk) collate gbk_chinese_ci desc
     </if>
     <if test="queryDTO.orderBy == null">
       order by id asc

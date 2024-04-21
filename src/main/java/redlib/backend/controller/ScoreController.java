@@ -3,6 +3,7 @@ package redlib.backend.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import redlib.backend.annotation.BackendModule;
@@ -76,6 +77,7 @@ public class ScoreController {
         workbook.close();
     }
 
+    @Transactional
     @PostMapping("importScores")
     @Privilege("add")
     public int importScores(@RequestParam("file") MultipartFile file) throws Exception {
@@ -92,6 +94,25 @@ public class ScoreController {
     @Privilege("page")
     public void exportScoreTemplate(HttpServletResponse response) throws Exception {
         Workbook workbook = scoreService.exportTemplate();
+        response.setContentType("application/vnd.ms-excel");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
+        response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");
+        OutputStream os = response.getOutputStream();
+        workbook.write(os);
+        os.close();
+        workbook.close();
+    }
+
+    @PostMapping("getTotalScores")
+    @Privilege("page")
+    public int getTotalScores() {
+        return scoreService.getTotalScores();
+    }
+
+    @PostMapping("exportAverage")
+    @Privilege("page")
+    public void exportAverage(@RequestBody AverageQueryDTO queryDTO, HttpServletResponse response) throws Exception {
+        Workbook workbook = scoreService.exportAverage(queryDTO);
         response.setContentType("application/vnd.ms-excel");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd$HHmmss");
         response.addHeader("Content-Disposition", "attachment;filename=file" + sdf.format(new Date()) + ".xls");

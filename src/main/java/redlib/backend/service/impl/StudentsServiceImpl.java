@@ -75,7 +75,7 @@ public class StudentsServiceImpl implements StudentsService {
         StudentsUtils.validateStudents(studentsDTO);
         Assert.notNull(studentsDTO.getId(), "id不能为空");
         Students students = studentsMapper.selectByPrimaryKey(studentsDTO.getId());
-        Assert.notNull(students, "没有找到Id为：" + studentsDTO.getId());
+        Assert.notNull(students, "没有找到ID为 " + studentsDTO.getId() + " 的学生");
         BeanUtils.copyProperties(studentsDTO, students);
         studentsMapper.updateByPrimaryKey(students);
         return students.getId();
@@ -98,7 +98,7 @@ public class StudentsServiceImpl implements StudentsService {
         map.put("id", "ID");
         map.put("studentName", "姓名");
         map.put("studentNum", "学号");
-        map.put("gender", "性别");
+        map.put("gender", "性别(男1女0)");
         map.put("parentName", "家长姓名");
         map.put("parentTel", "家长电话");
         map.put("classId", "班级号");
@@ -147,7 +147,7 @@ public class StudentsServiceImpl implements StudentsService {
     }
 
     @Override
-    public int getTotalOfStudents(Integer classId) {
+    public int getTotalStudentsOfClass(Integer classId) {
         StudentsQueryDTO queryDTO = new StudentsQueryDTO();
         queryDTO.setClassId(classId);
         return studentsMapper.count(queryDTO);
@@ -159,5 +159,11 @@ public class StudentsServiceImpl implements StudentsService {
         StudentsDTO dto = new StudentsDTO();
         if(students != null) BeanUtils.copyProperties(students, dto);
         return dto;
+    }
+
+    @Override
+    public int getTotalStudents() {
+        StudentsQueryDTO queryDTO = new StudentsQueryDTO();
+        return studentsMapper.count(queryDTO);
     }
 }

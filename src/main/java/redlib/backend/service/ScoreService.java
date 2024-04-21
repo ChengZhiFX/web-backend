@@ -22,4 +22,6 @@ public interface ScoreService {
     int importScores(InputStream inputStream, String fileName) throws Exception;
     Page<AverageVO> getAverageOfClass(AverageQueryDTO averageQueryDTO);
     Workbook exportTemplate();
+    int getTotalScores();
+    Workbook exportAverage(AverageQueryDTO queryDTO);
 }

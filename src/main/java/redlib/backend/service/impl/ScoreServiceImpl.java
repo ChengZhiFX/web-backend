@@ -97,7 +97,7 @@ public class ScoreServiceImpl implements ScoreService {
         Assert.notNull(studentsService.getByStudentNum(scoreDTO.getStudentNum()), "对应学号学生不存在");
         Assert.notNull(scoreDTO.getId(), "id不能为空");
         Score score = scoreMapper.selectByPrimaryKey(scoreDTO.getId());
-        Assert.notNull(score, "没有找到，Id为：" + scoreDTO.getId());
+        Assert.notNull(score, "没有找到流水号为 " + scoreDTO.getId() + " 的成绩");
         BeanUtils.copyProperties(scoreDTO, score);
         score.setTotalScore(score.getChineseScore()+score.getMathScore()+score.getEnglishScore());
         score.setClassId(studentsService.getByStudentNum(scoreDTO.getStudentNum()).getClassId());
@@ -125,9 +125,8 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("mathScore", "数学成绩");
         map.put("englishScore", "英语成绩");
         map.put("totalScore", "总成绩");
-        map.put("entryEvent", "录入时间");
         map.put("academicYear", "学年");
-        map.put("semester", "学期");
+        map.put("semester", "学期(1秋2春)");
         map.put("classId", "班级号");
         final AtomicBoolean finalPage = new AtomicBoolean(false);
         return XlsUtils.exportToExcel(page -> {
@@ -152,7 +151,7 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("数学成绩", "mathScore");
         map.put("英语成绩", "englishScore");
         map.put("学年", "academicYear");
-        map.put("学期", "semester");
+        map.put("学期(1秋2春)", "semester");
         AtomicInteger row = new AtomicInteger(0);
         XlsUtils.importFromExcel(inputStream, fileName, (scoreDTO) -> {
             addScore(scoreDTO);
@@ -163,10 +162,12 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public Page<AverageVO> getAverageOfClass(AverageQueryDTO averageQueryDTO) {
-        List<Map> list = scoreMapper.getAverageOfClass(averageQueryDTO);
         if (averageQueryDTO == null) {
             averageQueryDTO = new AverageQueryDTO();
         }
+        FormatUtils.trimFieldToNull(averageQueryDTO);
+        averageQueryDTO.setOrderBy(ScoreUtils.avgFormatOrderBy(averageQueryDTO.getOrderBy()));
+        List<Map> list = scoreMapper.getAverageOfClass(averageQueryDTO);
         int size = list.size();
         PageUtils pageUtils = new PageUtils(averageQueryDTO.getCurrent(), averageQueryDTO.getPageSize(), size);
         if (size == 0) {
@@ -199,7 +200,37 @@ public class ScoreServiceImpl implements ScoreService {
         map.put("mathScore", "数学成绩");
         map.put("englishScore", "英语成绩");
         map.put("academicYear", "学年");
-        map.put("semester", "学期");
+        map.put("semester", "学期(1秋2春)");
         return XlsUtils.exportToExcel(page -> new ArrayList<ScoreDTO>(), map);
+    }
+
+    @Override
+    public int getTotalScores() {
+        ScoreQueryDTO queryDTO = new ScoreQueryDTO();
+        return scoreMapper.count(queryDTO);
+    }
+
+    @Override
+    public Workbook exportAverage(AverageQueryDTO queryDTO) {
+        queryDTO.setPageSize(100);
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("classId", "班级号");
+        map.put("className", "班级名称");
+        map.put("averageChineseScore", "语文平均分");
+        map.put("averageMathScore", "数学平均分");
+        map.put("averageEnglishScore", "英语平均分");
+        map.put("averageTotalScore", "总平均分");
+        final AtomicBoolean finalPage = new AtomicBoolean(false);
+        return XlsUtils.exportToExcel(page -> {
+            if (finalPage.get()) {
+                return null;
+            }
+            queryDTO.setCurrent(page);
+            List<AverageVO> list = getAverageOfClass(queryDTO).getList();
+            if (list.size() != 100) {
+                finalPage.set(true);
+            }
+            return list;
+        }, map);
     }
 }

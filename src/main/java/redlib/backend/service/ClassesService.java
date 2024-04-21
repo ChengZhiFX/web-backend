@@ -19,4 +19,5 @@ public interface ClassesService {
     Workbook export(ClassesQueryDTO queryDTO);
     int importClasses(InputStream inputStream, String fileName) throws Exception;
     Workbook exportTemplate();
+    int getTotalClasses();
 }
